@@ -1,0 +1,52 @@
+{% extends "base.html" %}
+
+{% block title %}Sitemap - Consignment Stores Directory{% endblock %}
+
+{% block content %}
+<div class="container mx-auto px-4 py-8">
+    <h1 class="text-3xl font-bold mb-8">Sitemap</h1>
+
+    <div class="space-y-8">
+        <!-- Main Pages -->
+        <div>
+            <h2 class="text-2xl font-semibold mb-4">Main Pages</h2>
+            <ul class="list-disc pl-5 space-y-2">
+                <li><a href="{{ url_for('home') }}" class="text-blue-600 hover:underline">Home</a></li>
+                <li><a href="{{ url_for('about') }}" class="text-blue-600 hover:underline">About</a></li>
+                <li><a href="{{ url_for('xml_sitemap') }}" class="text-blue-600 hover:underline">XML Sitemap</a></li>
+            </ul>
+        </div>
+
+        <!-- States -->
+        <div>
+            <h2 class="text-2xl font-semibold mb-4">States</h2>
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                {% for state in states %}
+                <div>
+                    <h3 class="font-semibold mb-2">
+                        <a href="{{ url_for('state', state_name=state.slug) }}" class="text-blue-600 hover:underline">
+                            {{ state.name }} ({{ state.store_count }} stores)
+                        </a>
+                    </h3>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+
+        <!-- Popular Cities -->
+        <div>
+            <h2 class="text-2xl font-semibold mb-4">Popular Cities</h2>
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                {% for city in popular_cities %}
+                <div>
+                    <a href="{{ url_for('city', state_name=city.state_slug, city_name=city.city_slug) }}" 
+                       class="text-blue-600 hover:underline">
+                        {{ city.name }}, {{ city.state }} ({{ city.store_count }} stores)
+                    </a>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

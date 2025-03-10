@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    {% include 'partials/head.html' %}
+    <title>About Our Consignment Store Directory | Find Local Consignment Shops</title>
+    <meta name="description" content="Learn about our comprehensive directory of consignment stores across the United States. Discover how we help you find the best local consignment shops.">
+    <style>
+        .about-header {
+            background: linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%);
+            padding: 60px 0;
+            margin-bottom: 40px;
+            text-align: center;
+        }
+
+        .about-stats {
+            display: flex;
+            justify-content: center;
+            gap: 30px;
+            margin: 40px auto;
+            max-width: 1200px;
+            padding: 0 20px;
+        }
+
+        .stat-card {
+            flex: 1;
+            background: white;
+            padding: 25px;
+            border-radius: 12px;
+            text-align: center;
+            box-shadow: 0 2px 15px rgba(0,0,0,0.08);
+            transition: all 0.3s ease;
+            max-width: 300px;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 25px rgba(0,0,0,0.1);
+        }
+
+        .stat-icon {
+            font-size: 2.5rem;
+            margin-bottom: 15px;
+            width: 70px;
+            height: 70px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            margin: 0 auto 15px;
+        }
+
+        .stat-number {
+            font-size: 3.2rem;
+            font-weight: 700;
+            line-height: 1.2;
+            margin-bottom: 10px;
+            text-shadow: 1px 1px 1px rgba(0,0,0,0.05);
+        }
+
+        .stat-label {
+            font-size: 1.1rem;
+            font-weight: 500;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            color: #4b5563;
+        }
+
+        /* Individual stat card colors */
+        .stat-card:nth-child(1) {
+            background: linear-gradient(135deg, #ffffff 0%, #f0f9ff 100%);
+        }
+
+        .stat-card:nth-child(2) {
+            background: linear-gradient(135deg, #ffffff 0%, #f0fdf4 100%);
+        }
+
+        .stat-card:nth-child(3) {
+            background: linear-gradient(135deg, #ffffff 0%, #faf5ff 100%);
+        }
+
+        .stat-card:nth-child(1) .stat-icon {
+            color: #0369a1;
+            background: rgba(3, 105, 161, 0.1);
+        }
+
+        .stat-card:nth-child(2) .stat-icon {
+            color: #047857;
+            background: rgba(4, 120, 87, 0.1);
+        }
+
+        .stat-card:nth-child(3) .stat-icon {
+            color: #7c3aed;
+            background: rgba(124, 58, 237, 0.1);
+        }
+
+        .stat-card:nth-child(1) .stat-number {
+            color: #0369a1;
+        }
+
+        .stat-card:nth-child(2) .stat-number {
+            color: #047857;
+        }
+
+        .stat-card:nth-child(3) .stat-number {
+            color: #7c3aed;
+        }
+
+        .about-content {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        .about-section {
+            margin-bottom: 40px;
+        }
+
+        .about-section h2 {
+            color: #1f2937;
+            font-size: 1.8rem;
+            margin-bottom: 20px;
+        }
+
+        .about-section p {
+            color: #4b5563;
+            font-size: 1.1rem;
+            line-height: 1.7;
+            margin-bottom: 15px;
+        }
+
+        @media (max-width: 768px) {
+            .about-stats {
+                flex-direction: column;
+                align-items: center;
+                gap: 20px;
+            }
+
+            .stat-card {
+                width: 100%;
+                max-width: none;
+            }
+
+            .stat-number {
+                font-size: 2.8rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    {% include 'partials/header.html' %}
+
+    <div class="about-header">
+        <div class="about-stats">
+            <div class="stat-card">
+                <div class="stat-icon">
+                    <i class="fas fa-store-alt"></i>
+                </div>
+                <div class="stat-number">{{ total_stores }}</div>
+                <div class="stat-label">Verified Stores</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon">
+                    <i class="fas fa-city"></i>
+                </div>
+                <div class="stat-number">{{ total_cities }}</div>
+                <div class="stat-label">Cities Covered</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon">
+                    <i class="fas fa-map-marked-alt"></i>
+                </div>
+                <div class="stat-number">{{ total_states }}</div>
+                <div class="stat-label">States</div>
+            </div>
+        </div>
+    </div>
+
+    <div class="about-content">
+        <div class="about-section">
+            <h2>About Our Directory</h2>
+            <p>Welcome to the most comprehensive consignment store directory in the United States. Our mission is to connect shoppers with quality consignment stores in their area, making it easier to find pre-loved treasures and support sustainable shopping practices.</p>
+            <p>We've carefully curated a list of {{ total_stores }} verified consignment stores across {{ total_cities }} cities in {{ total_states }} states, ensuring you have access to the best second-hand shopping destinations near you.</p>
+        </div>
+
+        <div class="about-section">
+            <h2>Why Choose Us?</h2>
+            <p>Our directory offers detailed information about each store, including location, ratings, and reviews. We regularly update our listings to ensure accuracy and provide you with the most current information available.</p>
+            <p>Whether you're looking for vintage clothing, furniture, or accessories, our directory helps you discover the perfect consignment stores in your area.</p>
+        </div>
+
+        <div class="about-section">
+            <h2>Supporting Sustainable Shopping</h2>
+            <p>By choosing consignment shopping, you're not just finding unique items at great prices – you're also supporting sustainable consumption and helping reduce waste. Our directory makes it easier than ever to shop responsibly and sustainably.</p>
+        </div>
+    </div>
+
+    {% include 'partials/footer.html' %}
+</body>
+</html>

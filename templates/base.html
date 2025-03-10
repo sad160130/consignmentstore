@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Consignment Store Directory{% endblock %} | Find Local Consignment Stores</title>
+    <meta name="description" content="{% block meta_description %}Find local consignment stores, thrift shops, and secondhand boutiques near you. Browse our directory of consignment stores across the United States.{% endblock %}">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        .gradient-background {
+            background: linear-gradient(135deg, #1a4f98 0%, #1e40af 100%);
+        }
+        .hover-grow {
+            transition: transform 0.2s ease;
+        }
+        .hover-grow:hover {
+            transform: scale(1.02);
+        }
+    </style>
+</head>
+<body class="flex flex-col min-h-screen bg-gray-50">
+    <!-- Navigation -->
+    <nav class="gradient-background text-white shadow-lg">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between h-16">
+                <div class="flex">
+                    <div class="flex-shrink-0 flex items-center">
+                        <a href="{{ url_for('home') }}" class="text-xl font-bold">
+                            Consignment Directory
+                        </a>
+                    </div>
+                </div>
+                <div class="flex items-center">
+                    <a href="{{ url_for('home') }}" class="px-3 py-2 rounded-md text-sm font-medium hover:bg-blue-700">Home</a>
+                    <a href="{{ url_for('about') }}" class="px-3 py-2 rounded-md text-sm font-medium hover:bg-blue-700">About</a>
+                    <form action="{{ url_for('search') }}" method="get" class="ml-4">
+                        <div class="relative">
+                            <input type="text" name="q" placeholder="Search stores or cities..." 
+                                   class="w-64 px-4 py-1 text-gray-900 bg-white border rounded-full focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                   required>
+                            <button type="submit" class="absolute right-0 top-0 mt-1 mr-2">
+                                <i class="fas fa-search text-gray-600"></i>
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="flex-grow">
+        {% block content %}{% endblock %}
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-gray-800 text-gray-300">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-8">
+                <!-- About Section -->
+                <div class="col-span-1 md:col-span-2">
+                    <h3 class="text-white text-lg font-semibold mb-4">About Consignment Directory</h3>
+                    <p class="text-gray-400 mb-4">
+                        Your ultimate guide to finding local consignment stores, thrift shops, and secondhand boutiques across the United States. 
+                        Discover great deals on pre-loved items while supporting sustainable shopping.
+                    </p>
+                    <div class="flex space-x-4">
+                        <a href="#" class="text-gray-400 hover:text-white">
+                            <i class="fab fa-facebook-f"></i>
+                        </a>
+                        <a href="#" class="text-gray-400 hover:text-white">
+                            <i class="fab fa-twitter"></i>
+                        </a>
+                        <a href="#" class="text-gray-400 hover:text-white">
+                            <i class="fab fa-instagram"></i>
+                        </a>
+                    </div>
+                </div>
+
+                <!-- Quick Links -->
+                <div>
+                    <h3 class="text-white text-lg font-semibold mb-4">Quick Links</h3>
+                    <ul class="space-y-2">
+                        <li><a href="{{ url_for('home') }}" class="hover:text-white">Home</a></li>
+                        <li><a href="{{ url_for('about') }}" class="hover:text-white">About</a></li>
+                        <li><a href="{{ url_for('sitemap') }}" class="hover:text-white">HTML Sitemap</a></li>
+                        <li><a href="{{ url_for('xml_sitemap') }}" class="hover:text-white">XML Sitemap</a></li>
+                    </ul>
+                </div>
+
+                <!-- Stats -->
+                <div>
+                    <h3 class="text-white text-lg font-semibold mb-4">Directory Stats</h3>
+                    <ul class="space-y-2">
+                        <li>{{ total_stores }} Stores</li>
+                        <li>{{ total_cities }} Cities</li>
+                        <li>{{ total_states }} States</li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- Bottom Footer -->
+            <div class="border-t border-gray-700 mt-8 pt-8">
+                <div class="flex flex-col md:flex-row justify-between items-center">
+                    <p class="text-sm text-gray-400">
+                        © {{ current_year }} Consignment Directory. All rights reserved.
+                    </p>
+                    <div class="mt-4 md:mt-0">
+                        <ul class="flex space-x-4 text-sm">
+                            <li><a href="#" class="hover:text-white">Privacy Policy</a></li>
+                            <li><a href="#" class="hover:text-white">Terms of Service</a></li>
+                            <li><a href="#" class="hover:text-white">Contact Us</a></li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Scroll to Top Button -->
+    <button id="scrollToTop" 
+            class="fixed bottom-8 right-8 bg-blue-600 text-white p-3 rounded-full shadow-lg hover:bg-blue-700 transition-opacity duration-300 opacity-0 invisible"
+            onclick="window.scrollTo({top: 0, behavior: 'smooth'})">
+        <i class="fas fa-arrow-up"></i>
+    </button>
+
+    <script>
+        // Scroll to Top Button Visibility
+        const scrollToTopButton = document.getElementById('scrollToTop');
+        window.addEventListener('scroll', () => {
+            if (window.pageYOffset > 300) {
+                scrollToTopButton.classList.remove('opacity-0', 'invisible');
+                scrollToTopButton.classList.add('opacity-100');
+            } else {
+                scrollToTopButton.classList.add('opacity-0', 'invisible');
+                scrollToTopButton.classList.remove('opacity-100');
+            }
+        });
+    </script>
+</body>
+</html>

@@ -112,3 +112,10 @@
 2025-03-10 16:58:45,426 - INFO - 127.0.0.1 - - [10/Mar/2025 16:58:45] "GET / HTTP/1.1" 200 -
 2025-03-10 16:58:45,457 - INFO - 127.0.0.1 - - [10/Mar/2025 16:58:45] "GET /static/css/style.css HTTP/1.1" 200 -
 2025-03-10 16:58:45,673 - INFO - 127.0.0.1 - - [10/Mar/2025 16:58:45] "[33mGET /favicon.ico HTTP/1.1[0m" 404 -
+2025-03-10 17:08:39,005 - INFO - 127.0.0.1 - - [10/Mar/2025 17:08:39] "GET / HTTP/1.1" 200 -
+2025-03-10 17:08:39,217 - INFO - 127.0.0.1 - - [10/Mar/2025 17:08:39] "[36mGET /static/css/style.css HTTP/1.1[0m" 304 -
+2025-03-10 18:46:52,273 - INFO - 127.0.0.1 - - [10/Mar/2025 18:46:52] "GET / HTTP/1.1" 200 -
+2025-03-10 18:46:52,325 - INFO - 127.0.0.1 - - [10/Mar/2025 18:46:52] "[36mGET /static/css/style.css HTTP/1.1[0m" 304 -
+2025-03-10 19:12:49,743 - INFO - 127.0.0.1 - - [10/Mar/2025 19:12:49] "GET / HTTP/1.1" 200 -
+2025-03-10 19:12:49,782 - INFO - 127.0.0.1 - - [10/Mar/2025 19:12:49] "[36mGET /static/css/style.css HTTP/1.1[0m" 304 -
+2025-03-10 19:28:43,544 - INFO -  * Detected change in 'C:\\Users\\sanke\\Downloads\\Directory Project\\consignment-directory\\app.py', reloading

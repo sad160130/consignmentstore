@@ -1,12 +1,15 @@
-from flask import Flask, render_template, send_from_directory
-import os
+from flask import Flask
 
 app = Flask(__name__)
 
-# Basic route to test
 @app.route('/')
 def home():
-    return "Hello from Flask on Vercel!"
+    return 'Hello from Flask on Vercel!'
 
-# For Vercel deployment
+@app.route('/test')
+def test():
+    return 'Test route works!'
+
+# Required for Vercel
+app.debug = False
 app = app

@@ -1,51 +1,71 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    {% include 'partials/head.html' %}
-    <title>Search Results for "{{ query }}" | ConsignmentFinder</title>
-    <meta name="description" content="Search results for consignment stores matching '{{ query }}'. Find local consignment shops, browse by city or state, and discover quality second-hand stores near you.">
-    <meta name="robots" content="noindex, follow">
-</head>
-<body>
-    {% include 'partials/header.html' %}
+{% extends "base.html" %}
 
-    <!-- Search Hero Section -->
-    <section class="search-hero">
-        <div class="container">
-            <div class="search-hero-content">
-                <h1>Search Results for "{{ query }}"</h1>
-                
-                <div class="search-container">
-                    <form class="search-form" action="{{ url_for('search') }}" method="GET">
-                        <div class="search-input-group">
-                            <i class="fas fa-search"></i>
-                            <input type="text" 
-                                   name="q" 
-                                   value="{{ query }}" 
-                                   placeholder="Search by city, state, or store name..."
-                                   required>
-                        </div>
-                        <button type="submit" class="search-button">
-                            Search Again
-                        </button>
-                    </form>
+{% block title %}Search Consignment Stores | Find Local Thrift & Consignment Shops{% endblock %}
+
+{% block meta_description %}Search our directory of {{ total_stores }} consignment stores across {{ total_states }} states. Find local thrift stores, consignment shops, and second-hand boutiques near you.{% endblock %}
+
+{% block content %}
+<!-- Search Header Section -->
+<section class="page-header search-header">
+    <div class="container">
+        <nav aria-label="breadcrumb" class="breadcrumb">
+            <ol>
+                <li><a href="{{ url_for('home') }}">Home</a></li>
+                <li>Search</li>
+            </ol>
+        </nav>
+        <h1>Search Consignment Stores</h1>
+    </div>
+</section>
+
+<!-- Search Form Section -->
+<section class="section search-form-section">
+    <div class="container">
+        <form method="GET" action="{{ url_for('search') }}" class="search-form" id="searchForm">
+            <div class="search-input-group">
+                <div class="search-input-wrapper">
+                    <i class="fas fa-search"></i>
+                    <input type="text" 
+                           name="q" 
+                           id="searchInput" 
+                           value="{{ query }}" 
+                           placeholder="Search by state, city, or store name..."
+                           aria-label="Search term"
+                           required>
                 </div>
+                <button type="submit" class="search-submit">
+                    Search
+                </button>
             </div>
-        </div>
-    </section>
+        </form>
+    </div>
+</section>
 
-    <!-- Results Section -->
-    <section class="results-section">
-        <div class="container">
+<!-- Search Results Section -->
+<section class="section search-results-section">
+    <div class="container">
+        {% if query %}
+            <div class="results-header">
+                <h2>Search Results for "{{ query }}"</h2>
+                <p class="results-count">
+                    Found {{ states|length + cities|length + stores|length }} results
+                </p>
+            </div>
+
             <!-- States Results -->
-            {% if results.states %}
-            <div class="results-group">
-                <h2>States</h2>
-                <div class="states-grid">
-                    {% for state in results.states %}
-                    <a href="{{ url_for('state', state_name=state.slug) }}" class="state-card">
-                        <h3>{{ state.name }}</h3>
-                        <i class="fas fa-chevron-right"></i>
+            {% if states %}
+            <div class="results-group states-results">
+                <h3>States ({{ states|length }})</h3>
+                <div class="results-grid">
+                    {% for state in states %}
+                    <a href="{{ url_for('state', state_name=state.slug) }}" class="result-card state-card">
+                        <div class="card-content">
+                            <h4>{{ state.name }}</h4>
+                            <div class="stats">
+                                <span><i class="fas fa-store"></i> {{ state.store_count }} Stores</span>
+                                <span><i class="fas fa-city"></i> {{ state.city_count }} Cities</span>
+                            </div>
+                        </div>
                     </a>
                     {% endfor %}
                 </div>
@@ -53,15 +73,20 @@
             {% endif %}
 
             <!-- Cities Results -->
-            {% if results.cities %}
-            <div class="results-group">
-                <h2>Cities</h2>
-                <div class="cities-grid">
-                    {% for city in results.cities %}
-                    <a href="{{ url_for('city', state_name=city.state_slug, city_name=city.city_slug) }}" 
-                       class="city-card">
-                        <h3>{{ city.name }}, {{ city.state }}</h3>
-                        <i class="fas fa-chevron-right"></i>
+            {% if cities %}
+            <div class="results-group cities-results">
+                <h3>Cities ({{ cities|length }})</h3>
+                <div class="results-grid">
+                    {% for city in cities %}
+                    <a href="{{ url_for('city', state_name=city.state_slug, city_name=city.slug) }}" 
+                       class="result-card city-card">
+                        <div class="card-content">
+                            <h4>{{ city.name }}, {{ city.state_name }}</h4>
+                            <div class="stats">
+                                <span><i class="fas fa-store"></i> {{ city.store_count }} Stores</span>
+                                <span><i class="fas fa-comment"></i> {{ city.total_reviews }} Reviews</span>
+                            </div>
+                        </div>
                     </a>
                     {% endfor %}
                 </div>
@@ -69,47 +94,338 @@
             {% endif %}
 
             <!-- Stores Results -->
-            {% if results.stores %}
-            <div class="results-group">
-                <h2>Stores</h2>
-                <div class="stores-list">
-                    {% for store in results.stores %}
-                    <a href="{{ url_for('city', state_name=store.state_slug, city_name=store.city_slug) }}" 
-                       class="store-card">
-                        <div class="store-header">
-                            <h3>{{ store.name }}</h3>
-                            <div class="store-rating">
-                                <i class="fas fa-star"></i>
-                                <span>{{ store.rating }}</span>
-                                <span class="review-count">({{ store.review_count }} reviews)</span>
+            {% if stores %}
+            <div class="results-group stores-results">
+                <h3>Stores ({{ stores|length }})</h3>
+                <div class="results-grid">
+                    {% for store in stores %}
+                    <div class="result-card store-card">
+                        <div class="card-content">
+                            <h4>{{ store.name }}</h4>
+                            <div class="store-details">
+                                <p class="location">
+                                    <i class="fas fa-map-marker-alt"></i>
+                                    {{ store.city }}, {{ store.state }}
+                                </p>
+                                {% if store.address %}
+                                <p class="address">
+                                    <i class="fas fa-location-dot"></i>
+                                    {{ store.address }}
+                                </p>
+                                {% endif %}
+                                {% if store.phone %}
+                                <p class="phone">
+                                    <i class="fas fa-phone"></i>
+                                    <a href="tel:{{ store.phone }}">{{ store.phone }}</a>
+                                </p>
+                                {% endif %}
+                                <div class="reviews">
+                                    <i class="fas fa-comment"></i>
+                                    {{ store.review_count }} Review{% if store.review_count != 1 %}s{% endif %}
+                                </div>
                             </div>
+                            <a href="{{ url_for('city', state_name=store.state_slug, city_name=store.city_slug) }}" 
+                               class="view-city-link">
+                                View all stores in {{ store.city }}
+                            </a>
                         </div>
-                        <div class="store-location">
-                            <i class="fas fa-map-marker-alt"></i>
-                            <span>{{ store.city }}, {{ store.state }}</span>
-                        </div>
-                    </a>
+                    </div>
                     {% endfor %}
                 </div>
             </div>
             {% endif %}
 
-            <!-- No Results -->
-            {% if not results.states and not results.cities and not results.stores %}
+            {% if not states and not cities and not stores %}
             <div class="no-results">
                 <i class="fas fa-search"></i>
-                <h2>No Results Found</h2>
-                <p>We couldn't find any matches for "{{ query }}". Try:</p>
-                <ul>
-                    <li>Checking your spelling</li>
-                    <li>Using more general terms</li>
-                    <li>Searching by city or state name</li>
-                </ul>
+                <h3>No Results Found</h3>
+                <p>Try different keywords or check your spelling</p>
+                <div class="search-suggestions">
+                    <h4>Search Suggestions:</h4>
+                    <ul>
+                        <li>Try searching for a state name (e.g., "California")</li>
+                        <li>Try searching for a city name (e.g., "San Francisco")</li>
+                        <li>Try searching for a store name</li>
+                    </ul>
+                </div>
             </div>
             {% endif %}
-        </div>
-    </section>
 
-    {% include 'partials/footer.html' %}
-</body>
-</html>
+        {% else %}
+        <!-- Initial Search State -->
+        <div class="initial-search">
+            <h2>Find Consignment Stores Near You</h2>
+            <p>Search our directory of {{ total_stores }} stores across {{ total_states }} states</p>
+            <div class="search-suggestions">
+                <h3>Popular Searches:</h3>
+                <div class="popular-searches">
+                    {% for state in popular_states[:6] %}
+                    <a href="{{ url_for('state', state_name=state.slug) }}" class="popular-search-tag">
+                        {{ state.name }}
+                    </a>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+        {% endif %}
+    </div>
+</section>
+{% endblock %}
+
+{% block additional_head %}
+<style>
+/* Search Page Specific Styles */
+.search-header {
+    background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
+    color: white;
+    padding: 3rem 0;
+    margin-top: -2rem;
+}
+
+.search-form-section {
+    background: var(--bg-light);
+    padding: 2rem 0;
+}
+
+.search-form {
+    max-width: 800px;
+    margin: 0 auto;
+}
+
+.search-input-group {
+    display: flex;
+    gap: 1rem;
+}
+
+.search-input-wrapper {
+    flex: 1;
+    position: relative;
+}
+
+.search-input-wrapper i {
+    position: absolute;
+    left: 1rem;
+    top: 50%;
+    transform: translateY(-50%);
+    color: var(--text-secondary);
+}
+
+#searchInput {
+    width: 100%;
+    padding: 1rem 1rem 1rem 3rem;
+    border: 2px solid var(--border-color);
+    border-radius: var(--border-radius);
+    font-size: 1.1rem;
+    transition: border-color 0.3s ease;
+}
+
+#searchInput:focus {
+    border-color: var(--primary-color);
+    outline: none;
+}
+
+.search-submit {
+    background: var(--primary-color);
+    color: white;
+    border: none;
+    padding: 0 2rem;
+    border-radius: var(--border-radius);
+    cursor: pointer;
+    font-size: 1.1rem;
+    transition: background-color 0.3s ease;
+}
+
+.search-submit:hover {
+    background: var(--secondary-color);
+}
+
+.results-header {
+    margin-bottom: 2rem;
+    padding-bottom: 1rem;
+    border-bottom: 1px solid var(--border-color);
+}
+
+.results-count {
+    color: var(--text-secondary);
+    margin-top: 0.5rem;
+}
+
+.results-group {
+    margin-bottom: 3rem;
+}
+
+.results-group h3 {
+    margin-bottom: 1.5rem;
+    color: var(--text-primary);
+}
+
+.results-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 1.5rem;
+}
+
+.result-card {
+    background: var(--card-bg);
+    border-radius: var(--border-radius);
+    padding: 1.5rem;
+    box-shadow: var(--box-shadow);
+    transition: transform 0.3s ease;
+    text-decoration: none;
+    color: var(--text-primary);
+}
+
+.result-card:hover {
+    transform: translateY(-5px);
+}
+
+.result-card h4 {
+    margin: 0 0 1rem 0;
+    color: var(--primary-color);
+}
+
+.stats {
+    display: flex;
+    gap: 1rem;
+    color: var(--text-secondary);
+    font-size: 0.9rem;
+}
+
+.stats span {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.store-details {
+    display: grid;
+    gap: 0.5rem;
+    margin-bottom: 1rem;
+}
+
+.store-details p {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin: 0;
+    color: var(--text-secondary);
+}
+
+.store-details a {
+    color: var(--primary-color);
+    text-decoration: none;
+}
+
+.view-city-link {
+    display: inline-block;
+    margin-top: 1rem;
+    color: var(--primary-color);
+    text-decoration: none;
+    font-weight: 500;
+}
+
+.no-results {
+    text-align: center;
+    padding: 3rem 0;
+}
+
+.no-results i {
+    font-size: 3rem;
+    color: var(--text-secondary);
+    margin-bottom: 1rem;
+}
+
+.search-suggestions {
+    margin-top: 2rem;
+}
+
+.search-suggestions h4 {
+    margin-bottom: 1rem;
+}
+
+.search-suggestions ul {
+    list-style: none;
+    padding: 0;
+}
+
+.search-suggestions li {
+    margin-bottom: 0.5rem;
+    color: var(--text-secondary);
+}
+
+.initial-search {
+    text-align: center;
+    padding: 3rem 0;
+}
+
+.popular-searches {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1rem;
+    justify-content: center;
+    margin-top: 1rem;
+}
+
+.popular-search-tag {
+    background: var(--bg-light);
+    padding: 0.5rem 1rem;
+    border-radius: var(--border-radius);
+    text-decoration: none;
+    color: var(--text-primary);
+    transition: background-color 0.3s ease;
+}
+
+.popular-search-tag:hover {
+    background: var(--primary-color);
+    color: white;
+}
+
+@media (max-width: 768px) {
+    .search-input-group {
+        flex-direction: column;
+    }
+
+    .search-submit {
+        padding: 1rem;
+    }
+
+    .results-grid {
+        grid-template-columns: 1fr;
+    }
+}
+</style>
+{% endblock %}
+
+{% block additional_scripts %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const searchForm = document.getElementById('searchForm');
+    const searchInput = document.getElementById('searchInput');
+
+    // Add minimal delay to prevent excessive requests
+    let searchTimeout;
+    searchInput.addEventListener('input', function() {
+        clearTimeout(searchTimeout);
+        searchTimeout = setTimeout(() => {
+            if (searchInput.value.length >= 2) {
+                searchForm.submit();
+            }
+        }, 500);
+    });
+});
+</script>
+
+<script type="application/ld+json">
+{
+    "@context": "https://schema.org",
+    "@type": "WebPage",
+    "name": "Search Consignment Stores",
+    "description": "Search our directory of {{ total_stores }} consignment stores across {{ total_states }} states.",
+    "mainEntity": {
+        "@type": "SearchAction",
+        "target": "{{ request.url_root }}search?q={search_term_string}",
+        "query-input": "required name=search_term_string"
+    }
+}
+</script>
+{% endblock %}

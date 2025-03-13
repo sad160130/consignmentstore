@@ -1,52 +1,360 @@
 {% extends "base.html" %}
 
-{% block title %}Sitemap - Consignment Stores Directory{% endblock %}
+{% block title %}Sitemap | Consignment Store Directory{% endblock %}
+
+{% block meta_description %}Browse our complete directory of consignment stores across {{ total_states }} states and {{ total_cities }} cities. Find local thrift stores and consignment shops in your area.{% endblock %}
 
 {% block content %}
-<div class="container mx-auto px-4 py-8">
-    <h1 class="text-3xl font-bold mb-8">Sitemap</h1>
+<!-- Sitemap Header Section -->
+<section class="page-header sitemap-header">
+    <div class="container">
+        <nav aria-label="breadcrumb" class="breadcrumb">
+            <ol>
+                <li><a href="{{ url_for('home') }}">Home</a></li>
+                <li>Sitemap</li>
+            </ol>
+        </nav>
+        <h1>Directory Sitemap</h1>
+    </div>
+</section>
 
-    <div class="space-y-8">
+<!-- Sitemap Content Section -->
+<section class="section sitemap-content">
+    <div class="container">
         <!-- Main Pages -->
-        <div>
-            <h2 class="text-2xl font-semibold mb-4">Main Pages</h2>
-            <ul class="list-disc pl-5 space-y-2">
-                <li><a href="{{ url_for('home') }}" class="text-blue-600 hover:underline">Home</a></li>
-                <li><a href="{{ url_for('about') }}" class="text-blue-600 hover:underline">About</a></li>
-                <li><a href="{{ url_for('xml_sitemap') }}" class="text-blue-600 hover:underline">XML Sitemap</a></li>
+        <div class="sitemap-group">
+            <h2>Main Pages</h2>
+            <ul class="sitemap-list main-pages">
+                <li>
+                    <i class="fas fa-home"></i>
+                    <a href="{{ url_for('home') }}">Home</a>
+                </li>
+                <li>
+                    <i class="fas fa-info-circle"></i>
+                    <a href="{{ url_for('about') }}">About Us</a>
+                </li>
+                <li>
+                    <i class="fas fa-search"></i>
+                    <a href="{{ url_for('search') }}">Search</a>
+                </li>
             </ul>
         </div>
 
-        <!-- States -->
-        <div>
-            <h2 class="text-2xl font-semibold mb-4">States</h2>
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                {% for state in states %}
-                <div>
-                    <h3 class="font-semibold mb-2">
-                        <a href="{{ url_for('state', state_name=state.slug) }}" class="text-blue-600 hover:underline">
-                            {{ state.name }} ({{ state.store_count }} stores)
-                        </a>
-                    </h3>
+        <!-- States Directory -->
+        <div class="sitemap-group">
+            <h2>States Directory</h2>
+            <div class="regions-grid">
+                {% for region, states in regions.items() %}
+                <div class="region-section">
+                    <h3>{{ region }}</h3>
+                    <ul class="sitemap-list states-list">
+                        {% for state_name in states %}
+                            {% if state_name in processed_data %}
+                            <li>
+                                <i class="fas fa-map-marker-alt"></i>
+                                <a href="{{ url_for('state', state_name=state_name|safe_slugify) }}">
+                                    {{ state_name }}
+                                    <span class="count">({{ processed_data[state_name].store_count }} stores)</span>
+                                </a>
+                            </li>
+                            {% endif %}
+                        {% endfor %}
+                    </ul>
                 </div>
                 {% endfor %}
             </div>
         </div>
 
-        <!-- Popular Cities -->
-        <div>
-            <h2 class="text-2xl font-semibold mb-4">Popular Cities</h2>
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                {% for city in popular_cities %}
-                <div>
-                    <a href="{{ url_for('city', state_name=city.state_slug, city_name=city.city_slug) }}" 
-                       class="text-blue-600 hover:underline">
-                        {{ city.name }}, {{ city.state }} ({{ city.store_count }} stores)
-                    </a>
+        <!-- Cities by State -->
+        <div class="sitemap-group">
+            <h2>Cities Directory</h2>
+            <div class="states-accordion">
+                {% for state_name, state_data in processed_data.items()|sort %}
+                <div class="state-section">
+                    <button class="accordion-button" aria-expanded="false">
+                        <span>{{ state_name }}</span>
+                        <span class="city-count">({{ state_data.cities|length }} cities)</span>
+                        <i class="fas fa-chevron-down"></i>
+                    </button>
+                    <div class="accordion-content">
+                        <div class="cities-grid">
+                            {% for city in state_data.cities|sort(attribute='name') %}
+                            <div class="city-item">
+                                <a href="{{ url_for('city', state_name=state_name|safe_slugify, city_name=city.slug) }}">
+                                    {{ city.name }}
+                                    <span class="count">({{ city.store_count }} stores)</span>
+                                </a>
+                            </div>
+                            {% endfor %}
+                        </div>
+                    </div>
                 </div>
                 {% endfor %}
             </div>
         </div>
+
+        <!-- Directory Statistics -->
+        <div class="sitemap-stats">
+            <h2>Directory Statistics</h2>
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <i class="fas fa-store"></i>
+                    <div class="stat-content">
+                        <span class="stat-number">{{ total_stores }}</span>
+                        <span class="stat-label">Total Stores</span>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <i class="fas fa-city"></i>
+                    <div class="stat-content">
+                        <span class="stat-number">{{ total_cities }}</span>
+                        <span class="stat-label">Cities</span>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <i class="fas fa-map"></i>
+                    <div class="stat-content">
+                        <span class="stat-number">{{ total_states }}</span>
+                        <span class="stat-label">States</span>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
-</div>
+</section>
+{% endblock %}
+
+{% block additional_head %}
+<style>
+/* Sitemap Page Specific Styles */
+.sitemap-header {
+    background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
+    color: white;
+    padding: 3rem 0;
+    margin-top: -2rem;
+}
+
+.sitemap-group {
+    margin-bottom: 3rem;
+}
+
+.sitemap-group h2 {
+    margin-bottom: 1.5rem;
+    padding-bottom: 0.5rem;
+    border-bottom: 2px solid var(--border-color);
+}
+
+.sitemap-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.sitemap-list li {
+    margin-bottom: 0.5rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.sitemap-list a {
+    color: var(--text-primary);
+    text-decoration: none;
+    transition: color 0.3s ease;
+}
+
+.sitemap-list a:hover {
+    color: var(--primary-color);
+}
+
+.count {
+    color: var(--text-secondary);
+    font-size: 0.9rem;
+    margin-left: 0.5rem;
+}
+
+.regions-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 2rem;
+}
+
+.region-section h3 {
+    margin-bottom: 1rem;
+    color: var(--primary-color);
+}
+
+.states-accordion {
+    display: grid;
+    gap: 1rem;
+}
+
+.state-section {
+    background: var(--card-bg);
+    border-radius: var(--border-radius);
+    overflow: hidden;
+}
+
+.accordion-button {
+    width: 100%;
+    padding: 1rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background: none;
+    border: none;
+    cursor: pointer;
+    font-size: 1rem;
+    color: var(--text-primary);
+    transition: background-color 0.3s ease;
+}
+
+.accordion-button:hover {
+    background: var(--bg-light);
+}
+
+.accordion-button i {
+    transition: transform 0.3s ease;
+}
+
+.accordion-button[aria-expanded="true"] i {
+    transform: rotate(180deg);
+}
+
+.city-count {
+    color: var(--text-secondary);
+    font-size: 0.9rem;
+}
+
+.accordion-content {
+    display: none;
+    padding: 1rem;
+    border-top: 1px solid var(--border-color);
+}
+
+.accordion-button[aria-expanded="true"] + .accordion-content {
+    display: block;
+}
+
+.cities-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 1rem;
+}
+
+.city-item a {
+    display: block;
+    padding: 0.5rem;
+    color: var(--text-primary);
+    text-decoration: none;
+    transition: background-color 0.3s ease;
+    border-radius: var(--border-radius);
+}
+
+.city-item a:hover {
+    background: var(--bg-light);
+    color: var(--primary-color);
+}
+
+.sitemap-stats {
+    margin-top: 4rem;
+}
+
+.stats-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 2rem;
+    margin-top: 2rem;
+}
+
+.stat-card {
+    background: var(--card-bg);
+    padding: 2rem;
+    border-radius: var(--border-radius);
+    display: flex;
+    align-items: center;
+    gap: 1.5rem;
+    box-shadow: var(--box-shadow);
+}
+
+.stat-card i {
+    font-size: 2.5rem;
+    color: var(--primary-color);
+}
+
+.stat-content {
+    display: flex;
+    flex-direction: column;
+}
+
+.stat-number {
+    font-size: 1.5rem;
+    font-weight: bold;
+    color: var(--text-primary);
+}
+
+.stat-label {
+    color: var(--text-secondary);
+}
+
+@media (max-width: 768px) {
+    .regions-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .cities-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .stats-grid {
+        grid-template-columns: 1fr;
+    }
+}
+</style>
+{% endblock %}
+
+{% block additional_scripts %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Accordion functionality
+    const accordionButtons = document.querySelectorAll('.accordion-button');
+    
+    accordionButtons.forEach(button => {
+        button.addEventListener('click', () => {
+            const isExpanded = button.getAttribute('aria-expanded') === 'true';
+            button.setAttribute('aria-expanded', !isExpanded);
+        });
+    });
+
+    // URL hash handling
+    if (window.location.hash) {
+        const stateSection = document.querySelector(window.location.hash);
+        if (stateSection) {
+            const button = stateSection.querySelector('.accordion-button');
+            if (button) {
+                button.setAttribute('aria-expanded', 'true');
+                stateSection.scrollIntoView({ behavior: 'smooth' });
+            }
+        }
+    }
+});
+</script>
+
+<script type="application/ld+json">
+{
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    "itemListElement": [{
+        "@type": "ListItem",
+        "position": 1,
+        "name": "Home",
+        "item": "{{ request.url_root }}"
+    }, {
+        "@type": "ListItem",
+        "position": 2,
+        "name": "Sitemap",
+        "item": "{{ request.url }}"
+    }]
+}
+</script>
 {% endblock %}

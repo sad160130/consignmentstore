@@ -3,140 +3,374 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{% block title %}Consignment Store Directory{% endblock %} | Find Local Consignment Stores</title>
-    <meta name="description" content="{% block meta_description %}Find local consignment stores, thrift shops, and secondhand boutiques near you. Browse our directory of consignment stores across the United States.{% endblock %}">
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <title>{% block title %}{% endblock %}</title>
+    <meta name="description" content="{% block meta_description %}{% endblock %}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
+    {% block additional_head %}{% endblock %}
     <style>
-        .gradient-background {
-            background: linear-gradient(135deg, #1a4f98 0%, #1e40af 100%);
+        /* Core Navigation Styles */
+        .main-nav {
+            background: #fff;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            padding: 0.5rem 0;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
         }
-        .hover-grow {
-            transition: transform 0.2s ease;
+
+        .nav-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 1rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
         }
-        .hover-grow:hover {
-            transform: scale(1.02);
+
+        .logo {
+            text-decoration: none;
+            color: #2c3e50;
+            font-size: 1.5rem;
+            font-weight: bold;
+        }
+
+        .mobile-menu-toggle {
+            display: none;
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: #2c3e50;
+            padding: 0.5rem;
+        }
+
+        .nav-links {
+            display: flex;
+            align-items: center;
+        }
+
+        .primary-menu {
+            display: flex;
+            align-items: center;
+            gap: 1.5rem;
+        }
+
+        /* Dropdown Styles */
+        .dropdown {
+            position: relative;
+        }
+
+        .dropdown-toggle {
+            background: none;
+            border: none;
+            padding: 0.5rem;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            color: #2c3e50;
+            font-size: 1rem;
+        }
+
+        .dropdown-menu {
+            display: none;
+            position: absolute;
+            top: 100%;
+            left: 0;
+            background: white;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            border-radius: 4px;
+            min-width: 200px;
+            padding: 1rem;
+            z-index: 1000;
+        }
+
+        .dropdown-menu.active {
+            display: block;
+        }
+
+        .dropdown-section {
+            margin-bottom: 1rem;
+        }
+
+        .dropdown-section h3 {
+            color: #2c3e50;
+            font-size: 0.9rem;
+            margin-bottom: 0.5rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 1px solid #eee;
+        }
+
+        .dropdown-section ul {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        .dropdown-section li {
+            margin-bottom: 0.5rem;
+        }
+
+        .dropdown-section a {
+            color: #666;
+            text-decoration: none;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0.25rem 0;
+        }
+
+        .dropdown-section a:hover {
+            color: #3498db;
+        }
+
+        /* Navigation Links */
+        .nav-link {
+            color: #2c3e50;
+            text-decoration: none;
+            padding: 0.5rem;
+        }
+
+        .nav-link:hover {
+            color: #3498db;
+        }
+
+        /* Search Form */
+        .search-form {
+            display: flex;
+            align-items: center;
+            background: #f8f9fa;
+            border-radius: 20px;
+            padding: 0.25rem 0.5rem;
+        }
+
+        .search-form input {
+            border: none;
+            background: none;
+            padding: 0.25rem 0.5rem;
+            width: 150px;
+            outline: none;
+        }
+
+        .search-form button {
+            background: none;
+            border: none;
+            color: #666;
+            cursor: pointer;
+            padding: 0.25rem;
+        }
+
+        /* Footer Styles */
+        footer {
+            background: #2c3e50;
+            color: white;
+            padding: 3rem 1rem;
+            margin-top: 3rem;
+        }
+
+        .footer-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 2rem;
+        }
+
+        .footer-section h3 {
+            color: white;
+            margin-bottom: 1rem;
+            font-size: 1.2rem;
+        }
+
+        .footer-section ul {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        .footer-section li {
+            margin-bottom: 0.5rem;
+        }
+
+        .footer-section a {
+            color: #ecf0f1;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .footer-section a:hover {
+            color: #3498db;
+        }
+
+        .footer-bottom {
+            text-align: center;
+            margin-top: 2rem;
+            padding-top: 2rem;
+            border-top: 1px solid rgba(255,255,255,0.1);
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .mobile-menu-toggle {
+                display: block;
+            }
+
+            .nav-links {
+                display: none;
+                position: absolute;
+                top: 100%;
+                left: 0;
+                right: 0;
+                background: white;
+                padding: 1rem;
+                box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            }
+
+            .nav-links.active {
+                display: block;
+            }
+
+            .primary-menu {
+                flex-direction: column;
+                align-items: stretch;
+                gap: 1rem;
+            }
+
+            .dropdown-menu {
+                position: static;
+                box-shadow: none;
+                padding: 0.5rem 0 0.5rem 1rem;
+            }
+
+            .search-form {
+                width: 100%;
+            }
+
+            .search-form input {
+                width: 100%;
+            }
         }
     </style>
 </head>
-<body class="flex flex-col min-h-screen bg-gray-50">
-    <!-- Navigation -->
-    <nav class="gradient-background text-white shadow-lg">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="flex justify-between h-16">
-                <div class="flex">
-                    <div class="flex-shrink-0 flex items-center">
-                        <a href="{{ url_for('home') }}" class="text-xl font-bold">
-                            Consignment Directory
-                        </a>
-                    </div>
-                </div>
-                <div class="flex items-center">
-                    <a href="{{ url_for('home') }}" class="px-3 py-2 rounded-md text-sm font-medium hover:bg-blue-700">Home</a>
-                    <a href="{{ url_for('about') }}" class="px-3 py-2 rounded-md text-sm font-medium hover:bg-blue-700">About</a>
-                    <form action="{{ url_for('search') }}" method="get" class="ml-4">
-                        <div class="relative">
-                            <input type="text" name="q" placeholder="Search stores or cities..." 
-                                   class="w-64 px-4 py-1 text-gray-900 bg-white border rounded-full focus:outline-none focus:ring-2 focus:ring-blue-500"
-                                   required>
-                            <button type="submit" class="absolute right-0 top-0 mt-1 mr-2">
-                                <i class="fas fa-search text-gray-600"></i>
-                            </button>
+<body>
+    <nav class="main-nav">
+        <div class="nav-container">
+            <a href="{{ url_for('home') }}" class="logo">Consignment Store Directory</a>
+            <button class="mobile-menu-toggle" aria-label="Toggle navigation">
+                <i class="fas fa-bars"></i>
+            </button>
+            <div class="nav-links">
+                <ul class="primary-menu">
+                    <li><a href="{{ url_for('home') }}" class="nav-link">Home</a></li>
+                    <li><a href="{{ url_for('about') }}" class="nav-link">About</a></li>
+                    <li class="dropdown">
+                        <button class="dropdown-toggle">
+                            Browse States
+                            <i class="fas fa-chevron-down"></i>
+                        </button>
+                        <div class="dropdown-menu">
+                            {% for region, states in regions.items() %}
+                            <div class="dropdown-section">
+                                <h3>{{ region }}</h3>
+                                <ul>
+                                    {% for state in states %}
+                                    <li>
+                                        <a href="{{ url_for('state', state_name=state|safe_slugify) }}">
+                                            {{ state }}
+                                            <span class="count">{{ state_counts.get(state, 0) }}</span>
+                                        </a>
+                                    </li>
+                                    {% endfor %}
+                                </ul>
+                            </div>
+                            {% endfor %}
                         </div>
-                    </form>
-                </div>
+                    </li>
+                    <li>
+                        <form action="{{ url_for('search') }}" method="get" class="search-form">
+                            <input type="text" name="q" placeholder="Search..." aria-label="Search">
+                            <button type="submit" aria-label="Submit search">
+                                <i class="fas fa-search"></i>
+                            </button>
+                        </form>
+                    </li>
+                </ul>
             </div>
         </div>
     </nav>
 
-    <!-- Main Content -->
-    <main class="flex-grow">
+    <main>
         {% block content %}{% endblock %}
     </main>
 
-    <!-- Footer -->
-    <footer class="bg-gray-800 text-gray-300">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-            <div class="grid grid-cols-1 md:grid-cols-4 gap-8">
-                <!-- About Section -->
-                <div class="col-span-1 md:col-span-2">
-                    <h3 class="text-white text-lg font-semibold mb-4">About Consignment Directory</h3>
-                    <p class="text-gray-400 mb-4">
-                        Your ultimate guide to finding local consignment stores, thrift shops, and secondhand boutiques across the United States. 
-                        Discover great deals on pre-loved items while supporting sustainable shopping.
-                    </p>
-                    <div class="flex space-x-4">
-                        <a href="#" class="text-gray-400 hover:text-white">
-                            <i class="fab fa-facebook-f"></i>
-                        </a>
-                        <a href="#" class="text-gray-400 hover:text-white">
-                            <i class="fab fa-twitter"></i>
-                        </a>
-                        <a href="#" class="text-gray-400 hover:text-white">
-                            <i class="fab fa-instagram"></i>
-                        </a>
-                    </div>
-                </div>
-
-                <!-- Quick Links -->
-                <div>
-                    <h3 class="text-white text-lg font-semibold mb-4">Quick Links</h3>
-                    <ul class="space-y-2">
-                        <li><a href="{{ url_for('home') }}" class="hover:text-white">Home</a></li>
-                        <li><a href="{{ url_for('about') }}" class="hover:text-white">About</a></li>
-                        <li><a href="{{ url_for('sitemap') }}" class="hover:text-white">HTML Sitemap</a></li>
-                        <li><a href="{{ url_for('xml_sitemap') }}" class="hover:text-white">XML Sitemap</a></li>
-                    </ul>
-                </div>
-
-                <!-- Stats -->
-                <div>
-                    <h3 class="text-white text-lg font-semibold mb-4">Directory Stats</h3>
-                    <ul class="space-y-2">
-                        <li>{{ total_stores }} Stores</li>
-                        <li>{{ total_cities }} Cities</li>
-                        <li>{{ total_states }} States</li>
-                    </ul>
-                </div>
+    <footer>
+        <div class="footer-container">
+            <div class="footer-section">
+                <h3>About Us</h3>
+                <ul>
+                    <li><a href="{{ url_for('about') }}"><i class="fas fa-info-circle"></i> About</a></li>
+                    <li><a href="{{ url_for('about') }}#contact"><i class="fas fa-envelope"></i> Contact</a></li>
+                </ul>
             </div>
-
-            <!-- Bottom Footer -->
-            <div class="border-t border-gray-700 mt-8 pt-8">
-                <div class="flex flex-col md:flex-row justify-between items-center">
-                    <p class="text-sm text-gray-400">
-                        © {{ current_year }} Consignment Directory. All rights reserved.
-                    </p>
-                    <div class="mt-4 md:mt-0">
-                        <ul class="flex space-x-4 text-sm">
-                            <li><a href="#" class="hover:text-white">Privacy Policy</a></li>
-                            <li><a href="#" class="hover:text-white">Terms of Service</a></li>
-                            <li><a href="#" class="hover:text-white">Contact Us</a></li>
-                        </ul>
-                    </div>
-                </div>
+            <div class="footer-section">
+                <h3>Quick Links</h3>
+                <ul>
+                    <li><a href="{{ url_for('home') }}"><i class="fas fa-home"></i> Home</a></li>
+                    <li><a href="{{ url_for('sitemap') }}"><i class="fas fa-sitemap"></i> Sitemap</a></li>
+                    <li><a href="{{ url_for('sitemap_xml') }}"><i class="fas fa-code"></i> XML Sitemap</a></li>
+                </ul>
             </div>
+            <div class="footer-section">
+                <h3>Popular States</h3>
+                <ul>
+                    {% for state in popular_states[:5] %}
+                    <li>
+                        <a href="{{ url_for('state', state_name=state|safe_slugify) }}">
+                            <i class="fas fa-map-marker-alt"></i> {{ state }}
+                        </a>
+                    </li>
+                    {% endfor %}
+                </ul>
+            </div>
+            <div class="footer-section">
+                <h3>Statistics</h3>
+                <ul>
+                    <li><i class="fas fa-store"></i> {{ total_stores }} Stores</li>
+                    <li><i class="fas fa-city"></i> {{ total_cities }} Cities</li>
+                    <li><i class="fas fa-flag-usa"></i> {{ total_states }} States</li>
+                </ul>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <p>&copy; {{ current_year }} Consignment Store Directory. All rights reserved.</p>
         </div>
     </footer>
 
-    <!-- Scroll to Top Button -->
-    <button id="scrollToTop" 
-            class="fixed bottom-8 right-8 bg-blue-600 text-white p-3 rounded-full shadow-lg hover:bg-blue-700 transition-opacity duration-300 opacity-0 invisible"
-            onclick="window.scrollTo({top: 0, behavior: 'smooth'})">
-        <i class="fas fa-arrow-up"></i>
-    </button>
-
     <script>
-        // Scroll to Top Button Visibility
-        const scrollToTopButton = document.getElementById('scrollToTop');
-        window.addEventListener('scroll', () => {
-            if (window.pageYOffset > 300) {
-                scrollToTopButton.classList.remove('opacity-0', 'invisible');
-                scrollToTopButton.classList.add('opacity-100');
-            } else {
-                scrollToTopButton.classList.add('opacity-0', 'invisible');
-                scrollToTopButton.classList.remove('opacity-100');
+        // Mobile menu toggle
+        document.querySelector('.mobile-menu-toggle').addEventListener('click', function() {
+            document.querySelector('.nav-links').classList.toggle('active');
+        });
+
+        // Dropdown toggle
+        document.querySelectorAll('.dropdown-toggle').forEach(function(button) {
+            button.addEventListener('click', function() {
+                this.nextElementSibling.classList.toggle('active');
+            });
+        });
+
+        // Close dropdowns when clicking outside
+        document.addEventListener('click', function(event) {
+            if (!event.target.closest('.dropdown')) {
+                document.querySelectorAll('.dropdown-menu').forEach(function(menu) {
+                    menu.classList.remove('active');
+                });
             }
         });
     </script>
+    {% block additional_scripts %}{% endblock %}
 </body>
 </html>

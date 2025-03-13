@@ -1,0 +1,285 @@
+{% extends "base.html" %}
+
+{% block title %}Server Error | Consignment Store Directory{% endblock %}
+
+{% block meta_description %}An unexpected error occurred. Please try again later or contact support if the problem persists.{% endblock %}
+
+{% block additional_head %}
+<style>
+    .error-container {
+        min-height: 60vh;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        padding: 2rem;
+        text-align: center;
+        background: #f8f9fa;
+    }
+
+    .error-icon {
+        font-size: 4rem;
+        color: #e74c3c;
+        margin-bottom: 1.5rem;
+    }
+
+    .error-code {
+        font-size: 3.5rem;
+        font-weight: bold;
+        color: #2c3e50;
+        margin-bottom: 1rem;
+    }
+
+    .error-title {
+        font-size: 2rem;
+        color: #2c3e50;
+        margin-bottom: 1rem;
+    }
+
+    .error-message {
+        font-size: 1.1rem;
+        color: #666;
+        max-width: 600px;
+        margin-bottom: 2rem;
+        line-height: 1.6;
+    }
+
+    .error-actions {
+        display: flex;
+        gap: 1rem;
+        flex-wrap: wrap;
+        justify-content: center;
+        margin-bottom: 3rem;
+    }
+
+    .btn {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        padding: 0.8rem 1.5rem;
+        border-radius: 4px;
+        text-decoration: none;
+        transition: all 0.3s ease;
+        font-weight: 500;
+    }
+
+    .btn-primary {
+        background-color: #3498db;
+        color: white;
+    }
+
+    .btn-primary:hover {
+        background-color: #2980b9;
+    }
+
+    .btn-secondary {
+        background-color: #95a5a6;
+        color: white;
+    }
+
+    .btn-secondary:hover {
+        background-color: #7f8c8d;
+    }
+
+    .helpful-links {
+        background: white;
+        padding: 2rem;
+        border-radius: 8px;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        max-width: 800px;
+        margin: 0 auto;
+    }
+
+    .helpful-links h2 {
+        color: #2c3e50;
+        margin-bottom: 1.5rem;
+        font-size: 1.5rem;
+        text-align: center;
+    }
+
+    .links-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+        gap: 2rem;
+    }
+
+    .links-section h3 {
+        color: #2c3e50;
+        margin-bottom: 1rem;
+        font-size: 1.2rem;
+    }
+
+    .links-list {
+        list-style: none;
+        padding: 0;
+    }
+
+    .links-list li {
+        margin-bottom: 0.5rem;
+    }
+
+    .links-list a {
+        color: #3498db;
+        text-decoration: none;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+
+    .links-list a:hover {
+        color: #2980b9;
+    }
+
+    .count {
+        color: #666;
+        font-size: 0.9rem;
+    }
+
+    @media (max-width: 768px) {
+        .error-code {
+            font-size: 3rem;
+        }
+
+        .error-title {
+            font-size: 1.5rem;
+        }
+
+        .error-actions {
+            flex-direction: column;
+        }
+
+        .btn {
+            width: 100%;
+            justify-content: center;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="error-container">
+    <div class="error-icon">
+        <i class="fas fa-exclamation-circle"></i>
+    </div>
+    
+    <h1 class="error-code">500</h1>
+    <h2 class="error-title">Server Error</h2>
+    
+    <p class="error-message">
+        {{ error_message if error_message else "We're experiencing technical difficulties. Please try again later or contact support if the problem persists." }}
+    </p>
+
+    <div class="error-actions">
+        <a href="{{ url_for('home') }}" class="btn btn-primary">
+            <i class="fas fa-home"></i>
+            Return Home
+        </a>
+        <a href="{{ url_for('search') }}" class="btn btn-secondary">
+            <i class="fas fa-search"></i>
+            Search Directory
+        </a>
+        <a href="javascript:history.back()" class="btn btn-secondary">
+            <i class="fas fa-arrow-left"></i>
+            Go Back
+        </a>
+    </div>
+
+    <div class="helpful-links">
+        <h2>Popular Resources</h2>
+        <div class="links-grid">
+            <!-- Popular States -->
+            <div class="links-section">
+                <h3>Top States</h3>
+                <ul class="links-list">
+                    {% for state_name, state_data in processed_data.items()|sort(attribute='1.store_count', reverse=True) %}
+                        {% if loop.index <= 5 %}
+                            <li>
+                                <a href="{{ url_for('state', state_name=state_data.slug) }}">
+                                    <i class="fas fa-map-marker-alt"></i>
+                                    {{ state_name }}
+                                    <span class="count">({{ state_data.store_count }} stores)</span>
+                                </a>
+                            </li>
+                        {% endif %}
+                    {% endfor %}
+                </ul>
+            </div>
+
+            <!-- Popular Cities -->
+            <div class="links-section">
+                <h3>Top Cities</h3>
+                <ul class="links-list">
+                    {% set top_cities = [] %}
+                    {% for state_data in processed_data.values() %}
+                        {% for city in state_data.cities %}
+                            {% set city_info = {
+                                'name': city.name,
+                                'state': state_data.name,
+                                'state_slug': state_data.slug,
+                                'slug': city.slug,
+                                'store_count': city.store_count
+                            } %}
+                            {% if top_cities.append(city_info) %}{% endif %}
+                        {% endfor %}
+                    {% endfor %}
+
+                    {% for city in (top_cities|sort(attribute='store_count', reverse=True))[:5] %}
+                        <li>
+                            <a href="{{ url_for('city', state_name=city.state_slug, city_name=city.slug) }}">
+                                <i class="fas fa-city"></i>
+                                {{ city.name }}, {{ city.state }}
+                                <span class="count">({{ city.store_count }} stores)</span>
+                            </a>
+                        </li>
+                    {% endfor %}
+                </ul>
+            </div>
+
+            <!-- Quick Links -->
+            <div class="links-section">
+                <h3>Quick Links</h3>
+                <ul class="links-list">
+                    <li>
+                        <a href="{{ url_for('home') }}">
+                            <i class="fas fa-home"></i>
+                            Home Page
+                        </a>
+                    </li>
+                    <li>
+                        <a href="{{ url_for('search') }}">
+                            <i class="fas fa-search"></i>
+                            Search Directory
+                        </a>
+                    </li>
+                    <li>
+                        <a href="{{ url_for('about') }}">
+                            <i class="fas fa-info-circle"></i>
+                            About Us
+                        </a>
+                    </li>
+                    <li>
+                        <a href="{{ url_for('sitemap') }}">
+                            <i class="fas fa-sitemap"></i>
+                            Sitemap
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block additional_scripts %}
+<script>
+    // Track error in analytics (if you have analytics set up)
+    document.addEventListener('DOMContentLoaded', function() {
+        if (typeof gtag !== 'undefined') {
+            gtag('event', 'server_error', {
+                'event_category': 'error',
+                'event_label': window.location.pathname
+            });
+        }
+    });
+</script>
+{% endblock %}

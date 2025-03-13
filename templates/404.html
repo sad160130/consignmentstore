@@ -1,23 +1,220 @@
 {% extends "base.html" %}
 
-{% block title %}Page Not Found - Consignment Store Directory{% endblock %}
+{% block title %}Page Not Found | Consignment Store Directory{% endblock %}
+
+{% block meta_description %}The page you're looking for could not be found. Browse our directory of consignment stores, thrift shops, and second-hand boutiques.{% endblock %}
+
+{% block additional_head %}
+<style>
+    .error-container {
+        text-align: center;
+        padding: 4rem 1rem;
+        max-width: 800px;
+        margin: 0 auto;
+    }
+
+    .error-code {
+        font-size: 8rem;
+        font-weight: bold;
+        color: #e74c3c;
+        margin: 0;
+        line-height: 1;
+        opacity: 0.8;
+    }
+
+    .error-message {
+        font-size: 1.5rem;
+        color: #2c3e50;
+        margin: 1rem 0 2rem;
+    }
+
+    .error-description {
+        color: #666;
+        margin-bottom: 2rem;
+        font-size: 1.1rem;
+    }
+
+    .error-actions {
+        margin: 2rem 0;
+    }
+
+    .btn {
+        display: inline-block;
+        padding: 0.8rem 1.5rem;
+        margin: 0.5rem;
+        border-radius: 4px;
+        text-decoration: none;
+        transition: all 0.3s ease;
+        font-weight: 500;
+    }
+
+    .btn-primary {
+        background-color: #3498db;
+        color: white;
+    }
+
+    .btn-primary:hover {
+        background-color: #2980b9;
+    }
+
+    .btn-secondary {
+        background-color: #95a5a6;
+        color: white;
+    }
+
+    .btn-secondary:hover {
+        background-color: #7f8c8d;
+    }
+
+    .popular-resources {
+        margin-top: 3rem;
+        padding: 2rem;
+        background-color: #f8f9fa;
+        border-radius: 8px;
+    }
+
+    .popular-resources h2 {
+        color: #2c3e50;
+        margin-bottom: 1.5rem;
+        font-size: 1.5rem;
+    }
+
+    .resources-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+        gap: 1.5rem;
+        margin-top: 1.5rem;
+    }
+
+    .resource-card {
+        background: white;
+        padding: 1rem;
+        border-radius: 4px;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+
+    .resource-card h3 {
+        color: #2c3e50;
+        margin: 0 0 0.5rem 0;
+        font-size: 1.1rem;
+    }
+
+    .resource-card p {
+        color: #666;
+        margin: 0;
+        font-size: 0.9rem;
+    }
+
+    @media (max-width: 768px) {
+        .error-code {
+            font-size: 6rem;
+        }
+
+        .error-message {
+            font-size: 1.25rem;
+        }
+
+        .resources-grid {
+            grid-template-columns: 1fr;
+        }
+    }
+</style>
+{% endblock %}
 
 {% block content %}
-<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
-    <div class="text-center">
-        <h1 class="text-4xl font-bold text-gray-900 mb-4">
-            404 - Page Not Found
-        </h1>
-        <p class="text-lg text-gray-600 mb-8">
-            Sorry, we couldn't find the page you're looking for.
-        </p>
-        <a href="{{ url_for('home') }}" 
-           class="inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
-            <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/>
-            </svg>
-            Return Home
+<div class="error-container">
+    <h1 class="error-code">404</h1>
+    <h2 class="error-message">Page Not Found</h2>
+    <p class="error-description">
+        The page you're looking for might have been removed, had its name changed, 
+        or is temporarily unavailable.
+    </p>
+
+    <div class="error-actions">
+        <a href="{{ url_for('home') }}" class="btn btn-primary">
+            <i class="fas fa-home"></i> Return Home
+        </a>
+        <a href="{{ url_for('search') }}" class="btn btn-secondary">
+            <i class="fas fa-search"></i> Search Directory
         </a>
     </div>
+
+    <div class="popular-resources">
+        <h2>Popular Resources</h2>
+        <p>Here are some helpful places to start:</p>
+
+        <div class="resources-grid">
+            <!-- Popular States -->
+            <div class="resource-card">
+                <h3>Popular States</h3>
+                <ul>
+                    {% for state_name, state_data in processed_data.items()|sort(attribute='1.store_count', reverse=True) %}
+                        {% if loop.index <= 5 %}
+                            <li>
+                                <a href="{{ url_for('state', state_name=state_data.slug) }}">
+                                    {{ state_name }}
+                                    <span class="count">({{ state_data.store_count }} stores)</span>
+                                </a>
+                            </li>
+                        {% endif %}
+                    {% endfor %}
+                </ul>
+            </div>
+
+            <!-- Popular Cities -->
+            <div class="resource-card">
+                <h3>Popular Cities</h3>
+                <ul>
+                    {% set top_cities = [] %}
+                    {% for state_data in processed_data.values() %}
+                        {% for city in state_data.cities %}
+                            {% set city_info = {
+                                'name': city.name,
+                                'state': state_data.name,
+                                'state_slug': state_data.slug,
+                                'slug': city.slug,
+                                'store_count': city.store_count
+                            } %}
+                            {% if top_cities.append(city_info) %}{% endif %}
+                        {% endfor %}
+                    {% endfor %}
+
+                    {% for city in (top_cities|sort(attribute='store_count', reverse=True))[:5] %}
+                        <li>
+                            <a href="{{ url_for('city', state_name=city.state_slug, city_name=city.slug) }}">
+                                {{ city.name }}, {{ city.state }}
+                                <span class="count">({{ city.store_count }} stores)</span>
+                            </a>
+                        </li>
+                    {% endfor %}
+                </ul>
+            </div>
+
+            <!-- Quick Links -->
+            <div class="resource-card">
+                <h3>Quick Links</h3>
+                <ul>
+                    <li><a href="{{ url_for('home') }}">Home Page</a></li>
+                    <li><a href="{{ url_for('search') }}">Search Directory</a></li>
+                    <li><a href="{{ url_for('about') }}">About Us</a></li>
+                    <li><a href="{{ url_for('sitemap') }}">Sitemap</a></li>
+                </ul>
+            </div>
+        </div>
+    </div>
 </div>
+{% endblock %}
+
+{% block additional_scripts %}
+<script>
+    // Track 404 errors in analytics (if you have analytics set up)
+    document.addEventListener('DOMContentLoaded', function() {
+        if (typeof gtag !== 'undefined') {
+            gtag('event', '404_error', {
+                'event_category': 'error',
+                'event_label': window.location.pathname
+            });
+        }
+    });
+</script>
 {% endblock %}

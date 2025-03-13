@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.sitemaps.org/schemas/sitemap/0.9
+        http://www.sitemaps.org/schemas/sitemap/0.9/sitemap.xsd">
+
+    <!-- Main Pages -->
+    <url>
+        <loc>{{ url_for('home', _external=True) }}</loc>
+        <lastmod>{{ current_date.strftime('%Y-%m-%d') }}</lastmod>
+        <changefreq>daily</changefreq>
+        <priority>1.0</priority>
+    </url>
+    
+    <url>
+        <loc>{{ url_for('about', _external=True) }}</loc>
+        <lastmod>{{ current_date.strftime('%Y-%m-%d') }}</lastmod>
+        <changefreq>monthly</changefreq>
+        <priority>0.8</priority>
+    </url>
+    
+    <url>
+        <loc>{{ url_for('search', _external=True) }}</loc>
+        <lastmod>{{ current_date.strftime('%Y-%m-%d') }}</lastmod>
+        <changefreq>monthly</changefreq>
+        <priority>0.8</priority>
+    </url>
+    
+    <url>
+        <loc>{{ url_for('sitemap', _external=True) }}</loc>
+        <lastmod>{{ current_date.strftime('%Y-%m-%d') }}</lastmod>
+        <changefreq>weekly</changefreq>
+        <priority>0.6</priority>
+    </url>
+
+    <!-- State Pages -->
+    {% for state_slug, state_data in processed_data.items()|sort %}
+    <url>
+        <loc>{{ url_for('state', state_name=state_slug, _external=True) }}</loc>
+        <lastmod>{{ current_date.strftime('%Y-%m-%d') }}</lastmod>
+        <changefreq>weekly</changefreq>
+        <priority>0.9</priority>
+    </url>
+        
+        <!-- City Pages for each State -->
+        {% for city in state_data.cities|sort(attribute='name') %}
+        <url>
+            <loc>{{ url_for('city', state_name=state_slug, city_name=city.slug, _external=True) }}</loc>
+            <lastmod>{{ current_date.strftime('%Y-%m-%d') }}</lastmod>
+            <changefreq>weekly</changefreq>
+            <priority>0.8</priority>
+        </url>
+        {% endfor %}
+    {% endfor %}
+
+</urlset>
